@@ -7,28 +7,61 @@ import (
 	"strings"
 
 	"example.com/structs_practice/note"
+	"example.com/structs_practice/todo"
 )
 func getNoteData()(string,string){
 	title := getUserInput("Note title:")
 	content := getUserInput("Note content:")
 	return title,content
 }
+
+type saver interface {
+	Save() error 
+	
+} 
+
+type outputtable interface{
+	saver
+	Display()
+}
+func outputData(data outputtable)error{
+	data.Display()
+	return saveData(data)
+}
+
+func saveData(data saver)error{
+	data.Save()
+	err := data.Save()
+	if err != nil{
+		fmt.Println("Saving the note failed.")
+		return err
+	}
+	fmt.Println("Succesfully Saved note.")
+	return nil
+}
+
 func main(){
 	title,content:=getNoteData()
+	todoText:=getUserInput("Todo text:")
+	todo,err:=todo.New(todoText)
+	if err !=nil{
+		fmt.Println(err)
+		return
+	}
+	
 	userNote,err:=note.New(title,content)
 	if err != nil{
 		fmt.Println(err)
 		return
 	}
 
-	userNote.Display()
-	err = userNote.Save()
+	err=outputData(todo)
 	if err != nil{
-		fmt.Println("Saving the note failed.")
 		return
 	}
-	fmt.Println("Succesfully Saved note.")
 
+	outputData(userNote)
+	
 	
 }
 
